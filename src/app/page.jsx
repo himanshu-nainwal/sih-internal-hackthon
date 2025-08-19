@@ -74,11 +74,21 @@ export default function Home() {
         <header className="text-center mb-8 sm:mb-12">
           <div className="flex flex-col sm:flex-row justify-center items-center mb-4 sm:mb-6 space-y-4 sm:space-y-0">
             <div className="flex items-center">
-              <Trophy className="text-yellow-400 w-8 h-8 sm:w-12 sm:h-12 mr-2 sm:mr-4 animate-bounce" />
+              {/* <Trophy className="text-yellow-400 w-8 h-8 sm:w-12 sm:h-12 mr-2 sm:mr-4 animate-bounce" /> */}
+              <img 
+              src="images/Smart-India-Hackathon-2024.jpg" 
+              alt="Smart India Hackathon 2024 Logo" 
+              className="w-12 h-12 sm:w-16 sm:h-16 mr-3 sm:mr-4 rounded-lg shadow-lg"
+            />
               <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
                 SIH Internal Hackathon
               </h1>
-              <Code className="text-green-400 w-8 h-8 sm:w-12 sm:h-12 ml-2 sm:ml-4 animate-pulse" />
+              <img 
+              src="/images/wecode.jpg" 
+              alt="WeCode Logo" 
+              className="w-12 h-12 sm:w-16 sm:h-16 mr-3 ml-3 sm:mr-4 rounded-lg shadow-lg"
+            />
+              {/* <Code className="text-green-400 w-8 h-8 sm:w-12 sm:h-12 ml-2 sm:ml-4 animate-pulse" /> */}
             </div>
           </div>
           
