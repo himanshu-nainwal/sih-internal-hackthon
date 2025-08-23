@@ -10,45 +10,105 @@ export default function Home() {
     minutes: 0,
     seconds: 0
   });
+  const [teams, setTeams] = useState([]);
+  const [hackathonData, setHackathonData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Demo teams data
-  const [teams] = useState([
-    { id: 1, name: "CodeCrafters", date: "25" },
-    { id: 2, name: "TechTitans", date: "25" },
-    { id: 3, name: "ByteBuilders", date: "26" },
-    { id: 4, name: "InnovatorsHub", date: "25" },
-    { id: 5, name: "DataDrivenDevs", date: "26" },
-    { id: 6, name: "AlgoAces", date: "25" },
-    { id: 7, name: "CloudCoders", date: "26" },
-    { id: 8, name: "QuantumQueens", date: "25" },
-    { id: 9, name: "MLMasters", date: "26" },
-    { id: 10, name: "WebWizards", date: "25" },
-    { id: 11, name: "CyberSentinels", date: "26" },
-    { id: 12, name: "AppArchitects", date: "25" }
-  ]);
-
-  // Timer countdown logic
+  // Load data from JSON file
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prevTime => {
-        const totalSeconds = prevTime.hours * 3600 + prevTime.minutes * 60 + prevTime.seconds;
-        if (totalSeconds <= 0) {
-          return { hours: 0, minutes: 0, seconds: 0 };
+    const loadData = async () => {
+      try {
+        const response = await fetch('/team-data.json');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
         }
+        const data = await response.json();
         
-        const newTotalSeconds = totalSeconds - 1;
-        return {
-          hours: Math.floor(newTotalSeconds / 3600),
-          minutes: Math.floor((newTotalSeconds % 3600) / 60),
-          seconds: newTotalSeconds % 60
-        };
+        setTeams(data.teams);
+        setHackathonData(data.hackathon);
+        setTimeLeft({
+          hours: data.timer.initialHours,
+          minutes: data.timer.initialMinutes,
+          seconds: data.timer.initialSeconds
+        });
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError('Failed to load hackathon data');
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Timer logic
+  useEffect(() => {
+    if (loading) return;
+
+    let endTime = localStorage.getItem("hackathonEndTime");
+    if (!endTime) {
+      const now = Date.now();
+      endTime = now + (timeLeft.hours * 3600 + timeLeft.minutes * 60 + timeLeft.seconds) * 1000;
+      localStorage.setItem("hackathonEndTime", endTime);
+    } else {
+      endTime = parseInt(endTime);
+    }
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = Math.max(0, Math.floor((endTime - now) / 1000));
+
+      setTimeLeft({
+        hours: Math.floor(diff / 3600),
+        minutes: Math.floor((diff % 3600) / 60),
+        seconds: diff % 60,
       });
+
+      return diff > 0;
+    };
+
+    // Update immediately
+    updateTimer();
+
+    const timer = setInterval(() => {
+      if (!updateTimer()) {
+        clearInterval(timer);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [loading, timeLeft.hours, timeLeft.minutes, timeLeft.seconds]);
 
   const filteredTeams = teams.filter(team => team.date === selectedDate.split('/')[0]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white text-xl">Loading hackathon data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 text-xl mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 relative overflow-hidden">
@@ -74,35 +134,33 @@ export default function Home() {
         <header className="text-center mb-8 sm:mb-12">
           <div className="flex flex-col sm:flex-row justify-center items-center mb-4 sm:mb-6 space-y-4 sm:space-y-0">
             <div className="flex items-center">
-              {/* <Trophy className="text-yellow-400 w-8 h-8 sm:w-12 sm:h-12 mr-2 sm:mr-4 animate-bounce" /> */}
               <img 
-              src="images/Smart-India-Hackathon-2024.jpg" 
-              alt="Smart India Hackathon 2024 Logo" 
-              className="w-12 h-12 sm:w-16 sm:h-16 mr-3 sm:mr-4 rounded-lg shadow-lg"
-            />
+                src="images/Smart-India-Hackathon-2024.jpg" 
+                alt="Smart India Hackathon 2024 Logo" 
+                className="w-12 h-12 sm:w-16 sm:h-16 mr-3 sm:mr-4 rounded-lg shadow-lg"
+              />
               <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
-                SIH Internal Hackathon
+                {hackathonData?.title || 'SIH Internal Hackathon'}
               </h1>
               <img 
-              src="/images/wecode.jpg" 
-              alt="WeCode Logo" 
-              className="w-12 h-12 sm:w-16 sm:h-16 mr-3 ml-3 sm:mr-4 rounded-lg shadow-lg"
-            />
-              {/* <Code className="text-green-400 w-8 h-8 sm:w-12 sm:h-12 ml-2 sm:ml-4 animate-pulse" /> */}
+                src="/images/wecode.jpg" 
+                alt="WeCode Logo" 
+                className="w-12 h-12 sm:w-16 sm:h-16 mr-3 ml-3 sm:mr-4 rounded-lg shadow-lg"
+              />
             </div>
           </div>
           
           <div className="flex justify-center items-center mb-4">
             <Sparkles className="text-yellow-400 w-5 h-5 sm:w-6 sm:h-6 mr-2 animate-spin" />
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-200">
-              GEHU Bhimtal
+              {hackathonData?.subtitle || 'GEHU Bhimtal'}
             </h2>
             <Sparkles className="text-yellow-400 w-5 h-5 sm:w-6 sm:h-6 ml-2 animate-spin" />
           </div>
           
           <div className="mt-4 h-1 w-24 sm:w-32 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mx-auto rounded-full shadow-lg"></div>
           <p className="text-blue-200 text-sm sm:text-base mt-3 opacity-90 font-medium">
-            Innovation • Technology • Excellence
+            {hackathonData?.tagline || 'Innovation • Technology • Excellence'}
           </p>
         </header>
 
@@ -118,8 +176,14 @@ export default function Home() {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="w-full bg-gray-800/80 text-white border border-gray-600/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 backdrop-blur-sm text-center font-medium"
             >
-              <option value="25/8/25">🗓️ Day 1 - August 25, 2025</option>
-              <option value="26/8/25">🗓️ Day 2 - August 26, 2025</option>
+              {hackathonData?.dates?.map((dateOption) => (
+                <option key={dateOption.value} value={dateOption.value}>
+                  {dateOption.label}
+                </option>
+              )) || [
+                <option key="25/8/25" value="25/8/25">🗓️ Day 1 - August 25, 2025</option>,
+                <option key="26/8/25" value="26/8/25">🗓️ Day 2 - August 26, 2025</option>
+              ]}
             </select>
           </div>
         </div>
