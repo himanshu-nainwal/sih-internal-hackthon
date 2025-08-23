@@ -1,0 +1,33 @@
+{
+  "teams": [
+    { "id": 1, "name": "CodeCrafters", "date": "25" },
+    { "id": 2, "name": "TechTitans", "date": "25" },
+    { "id": 3, "name": "ByteBuilders", "date": "26" },
+    { "id": 4, "name": "InnovatorsHub", "date": "25" },
+    { "id": 5, "name": "DataDrivenDevs", "date": "26" },
+    { "id": 6, "name": "AlgoAces", "date": "25" },
+    { "id": 7, "name": "CloudCoders", "date": "26" },
+    { "id": 8, "name": "QuantumQueens", "date": "25" },
+    { "id": 9, "name": "MLMasters", "date": "26" },
+    { "id": 10, "name": "WebWizards", "date": "25" },
+    { "id": 11, "name": "CyberSentinels", "date": "26" },
+    { "id": 12, "name": "AppArchitects", "date": "25" },
+    {"id": 13, "name": "FullStackForce", "date": "26" },
+    { "id": 14, "name": "DevOpsDynamos", "date": "25" },
+    { "id": 15, "name": "UIUXUnicorns", "date": "26" }
+  ],
+  "hackathon": {
+    "title": "SIH Internal Hackathon",
+    "subtitle": "GEHU Bhimtal",
+    "tagline": "Innovation • Technology • Excellence",
+    "dates": [
+      { "value": "25/8/25", "label": "🗓️ Day 1 - August 25, 2025" },
+      { "value": "26/8/25", "label": "🗓️ Day 2 - August 26, 2025" }
+    ]
+  },
+  "timer": {
+    "initialHours": 26,
+    "initialMinutes": 0,
+    "initialSeconds": 0
+  }
+}
